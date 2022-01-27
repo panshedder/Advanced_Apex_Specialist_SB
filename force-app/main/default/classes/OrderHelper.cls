@@ -1,20 +1,22 @@
-public with sharing class OrderHelper {
-
-    /**
+public without sharing class OrderHelper {
+        /**
      * @name AfterUpdate
-     * @description 
+     * @description  Get the orders Ids of the Orders updated to Activated
      * @param List<Order> newList
      * @param List<Order> oldList
      * @return void
     **/
     public static void AfterUpdate(List<Order> newList, List<Order> oldList){
         Set<Id> orderIds = new Set<Id>();
-        for ( Integer i=0; i<newList.size(); i++ ){
-            if ( newList[i].Status == 'Activation' && oldList[i].Status != 'Activate' ){
+        for(Integer i = 0; i < newList.size(); i++) {
+            if(newList[i].Status == Constants.ACTIVATED_ORDER_STATUS && newList[i].Status != oldList[i].Status)
                 orderIds.add(newList[i].Id);
-            }
         }
+
+        if(!orderIds.isEmpty())
+            RollUpOrderItems(orderIds);
     }
+
 
     /**
      * @name RollUpOrderItems
@@ -24,14 +26,26 @@ public with sharing class OrderHelper {
     **/
     public static void RollUpOrderItems(Set<Id> activatedOrderIds){
         //ToDo: Declare a Map named "productMap" of Ids to Product2 records
+        Map<Id, Product2> productMap;
+        Set<Id> productIds = new Set<Id>();
 
         //ToDo: Loop through a query of OrderItems related to the activatedOrderIds
+        for(OrderItem oi: [SELECT Id, Quantity, Product2Id FROM OrderItem WHERE OrderId =: activatedOrderIds])
+            productIds.add(oi.Product2Id);
 
-            //ToDo: Populate the map with the Id of the related Product2 as the key and Product2 record as the value
+        //ToDo: Populate the map with the Id of the related Product2 as the key and Product2 record as the value
+        productMap = new Map<Id, Product2>([SELECT Id, Quantity_Ordered__c FROM Product2 WHERE Id IN :productIds]);
 
         //ToDo: Loop through a query that aggregates the OrderItems related to the Products in the ProductMap keyset
+        List<AggregateResult> agregateQtyOrderItems = [SELECT Product2Id, SUM(Quantity) sumQty FROM OrderItem
+                                                    WHERE Product2Id IN :productMap.keySet() 
+                                                    GROUP BY Product2Id];
+
+        for(AggregateResult agResult: agregateQtyOrderItems)
+            productMap.get((String) agResult.get('Product2Id')).Quantity_Ordered__c = Integer.valueOf(agResult.get('sumQty'));
+        
 
         //ToDo: Perform an update on the records in the productMap
+        update productMap.values();
     }
-
 }
