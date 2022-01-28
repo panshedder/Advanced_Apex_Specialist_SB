@@ -13,23 +13,29 @@
                 <apex:pageBlockButtons location="bottom">
                     <apex:commandButton action="{!addRows}" value="Add" />
                 </apex:pageBlockButtons>
+                
 
-                <apex:pageBlockTable value="{!productsToInsert}" var="p" id="orderItemTable" >
-                    <apex:column headerValue="Name" >
+                <apex:pageBlockTable value="{!productsToInsert}" var="p" id="orderItemTable">
+                    <apex:column>
+                        <apex:facet name="header">{!$ObjectType.Product2.fields.Name.Label}</apex:facet>
                         <apex:inputText value="{!p.Name}" />
                     </apex:column>
-                    <apex:column headerValue="Family" >
-                        <apex:selectList value="{!p.Family}" size="1" multiselect="false" >
+                    <apex:column>
+                        <apex:facet name="header">{!$ObjectType.Product2.fields.Family.Label}</apex:facet>
+                        <apex:selectList value="{!p.Family}" size="1" multiselect="false">
+                            <apex:selectOptions value="{!familyOptions}" />
                         </apex:selectList>
                     </apex:column>
-                    <apex:column headerValue="Active" >
-                        <apex:inputField value="{!p.isActive}" />
+                    <apex:column>
+                        <apex:facet name="header">{!$ObjectType.Product2.fields.isActive.Label}</apex:facet>
+                        <apex:inputText value="{!p.isActive}"/>
                     </apex:column>
-                    <apex:column headerValue="UnitPrice" >
-                        <inputText value="UnitPrice" />
+                    <apex:column headerValue="UnitPrice">
+                        <apex:facet name="header">UnitPrice</apex:facet>
                     </apex:column>
-                    <apex:column headerValue="Init Inventory" >
-                        <apex:inputField value="{!p.Initial_Inventory__c}" />
+                    <apex:column>
+                        <apex:facet name="header">{!$ObjectType.Product2.fields.Initial_Inventory__c.Label}</apex:facet>
+                        <apex:inputText value="{!p.Initial_Inventory__c}"/>
                     </apex:column>
                 </apex:pageBlockTable>
             </apex:pageBlock>

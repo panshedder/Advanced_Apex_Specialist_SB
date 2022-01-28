@@ -8,9 +8,20 @@ public class Product2Extension {
     }
 
     public void AddRows(){
-        for ( Integer i=0; i<2; i++ ){
+        for ( Integer i = 0; i < Constants.DEFAULT_ROWS; i++){
             productsToInsert.add( new Product2() );
         }
+    }
+
+    public List<SelectOption> GetFamilyOptions() {
+        List<SelectOption> returnedFamilyOptions = new List<SelectOption>();
+
+        returnedFamilyOptions.add(new SelectOption(Constants.SELECT_ONE, Constants.SELECT_ONE));
+
+        for(Schema.PicklistEntry familyOption: Constants.PRODUCT_FAMILY)
+           returnedFamilyOptions.add(new SelectOption(familyOption.getLabel(), familyOption.getLabel()));
+
+        return returnedFamilyOptions;
     }
 
     public List<ChartHelper.ChartData> GetInventory(){
@@ -30,5 +41,4 @@ public class Product2Extension {
         }
         return null;
     }
-
 }
