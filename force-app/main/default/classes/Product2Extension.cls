@@ -1,15 +1,16 @@
 public class Product2Extension {
 
-    public List<Product2> productsToInsert {get;set;}
+    //public List<Product2> productsToInsert {get;set;}
+    public List<ProductWrapper> productsToInsert {get; set;}
 
     public Product2Extension(){
-        productsToInsert = new List<Product2>();
+        productsToInsert = new List<ProductWrapper>();
         addRows();
     }
 
     public void AddRows(){
         for ( Integer i = 0; i < Constants.DEFAULT_ROWS; i++){
-            productsToInsert.add( new Product2() );
+            productsToInsert.add( new ProductWrapper() );
         }
     }
 
@@ -30,7 +31,27 @@ public class Product2Extension {
 
     public PageReference Save(){
         try {
-            insert productsToInsert;
+            List<Product2> products = new List<Product2>();
+            List<PriceBookEntry> pbEntries = new List<PriceBookEntry>();
+
+            for(ProductWrapper pti: productsToInsert) {
+                if(pti.productRecord != null && pti.pricebookEntryRecord != null) {
+                    products.add(pti.productRecord);
+
+                    pti.pricebookEntryRecord.IsActive = true;
+                    pti.pricebookEntryRecord.Pricebook2Id = Constants.STANDARD_PRICEBOOK_ID;
+                    
+                    pbEntries.add(pti.pricebookEntryRecord);
+                }
+            }
+            insert products;
+
+            for(Integer i = 0; i < products.size(); i++) {
+                pbEntries[i].Product2Id = products[i].Id;
+            }
+            insert pbEntries;
+
+            //insert productsToInsert;
 
             //If successful clear the list and display an informational message
             apexPages.addMessage(new ApexPages.message(ApexPages.Severity.INFO,productsToInsert.size()+' Inserted'));
@@ -40,5 +61,10 @@ public class Product2Extension {
 
         }
         return null;
+    }
+
+    class ProductWrapper {
+        Product2 productRecord;
+        PriceBookEntry pricebookEntryRecord;
     }
 }
