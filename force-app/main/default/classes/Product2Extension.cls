@@ -3,7 +3,7 @@ public class Product2Extension {
     //public List<Product2> productsToInsert {get;set;}
     public List<ProductWrapper> productsToInsert {get; set;}
 
-    public Product2Extension(){
+    public Product2Extension(ApexPages.StandardController controller){
         productsToInsert = new List<ProductWrapper>();
         addRows();
     }
@@ -63,8 +63,13 @@ public class Product2Extension {
         return null;
     }
 
-    class ProductWrapper {
-        Product2 productRecord;
-        PriceBookEntry pricebookEntryRecord;
+    public class ProductWrapper {
+        public Product2 productRecord {get; set;}
+        public PriceBookEntry pricebookEntryRecord {get; set;}
+
+        public productWrapper() {
+            productRecord = new Product2();
+            pricebookEntryRecord = new PricebookEntry();
+        }
     }
 }
