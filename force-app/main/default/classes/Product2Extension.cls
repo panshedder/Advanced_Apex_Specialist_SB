@@ -1,17 +1,16 @@
-public class Product2Extension {
+public without sharing class Product2Extension {
 
     //public List<Product2> productsToInsert {get;set;}
     public List<ProductWrapper> productsToInsert {get; set;}
 
     public Product2Extension(ApexPages.StandardController controller){
         productsToInsert = new List<ProductWrapper>();
-        addRows();
+        AddRows();
     }
 
     public void AddRows(){
-        for ( Integer i = 0; i < Constants.DEFAULT_ROWS; i++){
+        for(Integer i = 0; i < Constants.DEFAULT_ROWS; i++)
             productsToInsert.add( new ProductWrapper() );
-        }
     }
 
     public List<SelectOption> GetFamilyOptions() {
@@ -30,12 +29,18 @@ public class Product2Extension {
     }
 
     public PageReference Save(){
+
+        Savepoint sp = Database.setSavePoint();
+
         try {
             List<Product2> products = new List<Product2>();
             List<PriceBookEntry> pbEntries = new List<PriceBookEntry>();
 
             for(ProductWrapper pti: productsToInsert) {
-                if(pti.productRecord != null && pti.pricebookEntryRecord != null) {
+                if(pti.productRecord != null && pti.pricebookEntryRecord != null
+                    && !String.isEmpty(pti.productRecord.Name) && pti.productRecord.Family != Constants.SELECT_ONE
+                    && pti.productRecord.IsActive != null && pti.pricebookEntryRecord.UnitPrice != null ) {
+
                     products.add(pti.productRecord);
 
                     pti.pricebookEntryRecord.IsActive = true;
@@ -47,18 +52,17 @@ public class Product2Extension {
             insert products;
 
             for(Integer i = 0; i < products.size(); i++) {
-                pbEntries[i].Product2Id = products[i].Id;
+                    pbEntries[i].Product2Id = products[i].Id;
             }
             insert pbEntries;
-
-            //insert productsToInsert;
 
             //If successful clear the list and display an informational message
             apexPages.addMessage(new ApexPages.message(ApexPages.Severity.INFO,productsToInsert.size()+' Inserted'));
             productsToInsert.clear();   //Do not remove
             addRows();  //Do not remove
         } catch (Exception e){
-
+            ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, Constants.ERROR_MESSAGE));
+            Database.rollback(sp);
         }
         return null;
     }
