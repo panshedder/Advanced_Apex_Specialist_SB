@@ -52,12 +52,26 @@ public with sharing class TestDataFactory {
      * @name CreatePricebookEntries
      * @description Constructs a list of PricebookEntry records for unit tests
     **/
-    public void ConstructPricebookEntries(List<Product2> prods){
+    public static List<PricebookEntry> ConstructPricebookEntries(List<Product2> prods){
         //ToDo: Ensure this method returns a corresponding list of PricebookEntries records
         //  related to the provided Products
         //  with all the required fields populated
         //  and IsActive = true
         //  and belonging to the standard Pricebook
+        List<PriceBookEntry> pbEntries = new List<PriceBookEntry>();
+
+        for(Product2 prod: prods) {
+            PricebookEntry pbEntry = new PricebookEntry();
+            pbEntry.IsActive = true;
+            pbEntry.Pricebook2Id = Constants.STANDARD_PRICEBOOK_ID;
+            pbEntry.Product2Id = prod.Id;
+
+            pbEntries.add(pbEntry);
+        }
+
+        insert pbEntries;
+
+        return pbEntries;
     }
 
     /**
