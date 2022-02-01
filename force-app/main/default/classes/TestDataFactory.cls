@@ -8,22 +8,44 @@ public with sharing class TestDataFactory {
      * @name ConstructCollaborationGroup
      * @description
     **/
-    public void ConstructCollaborationGroup(){
+    public static void ConstructCollaborationGroup(){
         //ToDo: Ensure this method returns a single Chatter CollaborationGroup
         //    whose Name starts with 'TEST' followed by the INVENTORY_ANNOUNCEMENTS constant
         //    and configured so anyone can join, see and post updates.
+        CollaborationGroup collGroup = new CollaborationGroup();
+        collGroup.Name = 'TEST ' + Constants.INVENTORY_ANNOUNCEMENTS;
+        collGroup.CollaborationType = 'Public';
+
+        insert collGroup;
     }
 
     /**
      * @name CreateProducts
      * @description Constructs a list of Product2 records for unit tests
     **/
-    public void ConstructProducts(Integer cnt){
+    public static List<Product2> ConstructProducts(Integer cnt){
         //ToDo: Ensure this method returns a list, of size cnt, of uniquely named Product2 records
         //  with all the required fields populated
         //  and IsActive = true
         //  an Initial Inventory set to 10
         //  and iterating through the product family picklist values throughout the list.
+        List<Product2> products = new List<Product2>();
+        List<String> productFamilies = new List<String>();
+
+        for(Schema.PicklistEntry familyOption: Constants.PRODUCT_FAMILY)
+            productFamilies.add(familyOption.getValue());
+
+        for(Integer i = 0; i < cnt; i++) {
+            Product2 product = new Product2();
+            product.Name = 'Test ' + i + 'on ' + System.today() + ' ' + System.now();
+            product.IsActive = true;
+            product.Initial_Inventory__c = 10;
+            product.Family = productFamilies[Integer.valueOf((i/cnt) * productFamilies.size())];
+            products.add(product);
+        }
+        insert products;
+
+        return products;
     }
 
     /**
