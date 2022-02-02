@@ -25,7 +25,7 @@ private class Product2Tests {
         for(Integer i = 0; i < finalRowSize; i++) {
             ext.productsToInsert[i].productRecord = new Product2();
             ext.productsToInsert[i].productRecord.Name = 'Test class ' + i;
-            ext.productsToInsert[i].productRecord.Family = Constants.PRODUCT_FAMILY[0].getValue();
+            ext.productsToInsert[i].productRecord.Family = Constants.PRODUCT_FAMILY[Math.mod(i, Constants.PRODUCT_FAMILY.size())].getValue();
             ext.productsToInsert[i].productRecord.IsActive = true;
             ext.productsToInsert[i].productRecord.Initial_Inventory__c = 1;
 
