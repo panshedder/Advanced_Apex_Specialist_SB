@@ -61,7 +61,6 @@ public class Product2Extension {
             productsToInsert.clear();   //Do not remove
             addRows();  //Do not remove
         } catch (Exception e){
-            System.debug('Error occured');
             ApexPages.addMessage(new ApexPages.Message(ApexPages.Severity.ERROR, Constants.ERROR_MESSAGE));
             Database.rollback(sp);
         }
