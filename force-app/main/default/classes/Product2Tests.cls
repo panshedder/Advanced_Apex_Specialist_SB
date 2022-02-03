@@ -14,17 +14,17 @@ private class Product2Tests {
         Apexpages.StandardController stdContr = new Apexpages.StandardController(productPage[0]);
 
         Product2Extension ext = new Product2Extension(stdContr);
-        Integer initialRowsSize = ext.productsToInsert.size();
 
         List<SelectOption> families = ext.GetFamilyOptions();
         ext.GetInventory();
 
+        System.assert(ext.productsToInsert.size() == Constants.DEFAULT_ROWS);
         ext.AddRows();
-        Integer finalRowSize = ext.productsToInsert.size();
+        System.assert(ext.productsToInsert.size() == Constants.DEFAULT_ROWS * 2);
 
-        for(Integer i = 0; i < finalRowSize; i++) {
+        for(Integer i = 0; i < ext.productsToInsert.size(); i++) {
             ext.productsToInsert[i].productRecord = new Product2();
-            ext.productsToInsert[i].productRecord.Name = 'Test class ' + i;
+            ext.productsToInsert[i].productRecord.Name = 'Test class Ext' + i;
             ext.productsToInsert[i].productRecord.Family = Constants.PRODUCT_FAMILY[Math.mod(i, Constants.PRODUCT_FAMILY.size())].getValue();
             ext.productsToInsert[i].productRecord.IsActive = true;
             ext.productsToInsert[i].productRecord.Initial_Inventory__c = 1;
@@ -37,9 +37,9 @@ private class Product2Tests {
         Test.startTest();
             ext.Save();
         Test.stopTest();
-        List<Product2> queriedProduct = [SELECT Id FROM Product2 WHERE Name Like 'Test class%'];
 
-        System.assertEquals(finalRowSize, queriedProduct.size());
-        System.assertEquals(familiesNumber + 1, families.size());
+        List<Product2> products = [SELECT Id FROM Product2 WHERE Name = 'Test class Ext%'];
+
+        System.assertEquals(Constants.DEFAULT_ROWS * 2, products.size());
     }
 }

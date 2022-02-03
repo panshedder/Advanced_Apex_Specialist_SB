@@ -37,7 +37,7 @@ public with sharing class TestDataFactory {
 
         for(Integer i = 0; i < cnt; i++) {
             Product2 product = new Product2();
-            product.Name = 'Product' + i;
+            product.Name = 'Test' + i;
             product.IsActive = true;
             product.Initial_Inventory__c = 10;
             product.Family = productFamilies[Math.mod(i, productFamilies.size())];
@@ -138,7 +138,7 @@ public with sharing class TestDataFactory {
         //  Hint: Use the DEFAULT_ROWS constant for Quantity as it will be used in the next challenge
         List<OrderItem> newOrdersItems = new List<OrderItem>();
 
-        for(Integer i = 0; i < ords.size(); i++) {
+        for(Integer i = 0; i < cnt; i++) {
             OrderItem orderItem = new orderItem();
             orderItem.OrderId = ords[Math.mod(i, ords.size())].Id;
             orderItem.Quantity = Constants.DEFAULT_ROWS;
@@ -153,7 +153,7 @@ public with sharing class TestDataFactory {
     /**
      * @name SetupTestData
      * @description Inserts accounts, contacts, Products, PricebookEntries, Orders, and OrderItems.
-    **/
+     **/
     public static void InsertTestData(Integer cnt){
         //ToDo: Ensure this method calls each of the construct methods
         //  and inserts the results for use as test data.
@@ -171,5 +171,9 @@ public with sharing class TestDataFactory {
         insert ordersConstructed;
         List<OrderItem> orderItemsConstructed = ConstructOrderItems(cnt, pricebookEntriesConstructed, ordersConstructed);
         insert orderItemsConstructed;
+    }
+
+    public static void VerifyQuantityOrdered(Product2 originalProduct, Product2 updatedProduct, Integer qtyOrdered) {
+        System.assertEquals(qtyOrdered, updatedProduct.Quantity_Ordered__c - originalProduct.Quantity_Ordered__c);
     }
 }

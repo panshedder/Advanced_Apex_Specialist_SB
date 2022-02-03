@@ -1,6 +1,5 @@
 public class Product2Extension {
 
-    //public List<Product2> productsToInsert {get;set;}
     public List<ProductWrapper> productsToInsert {get; set;}
 
     public Product2Extension(ApexPages.StandardController controller){

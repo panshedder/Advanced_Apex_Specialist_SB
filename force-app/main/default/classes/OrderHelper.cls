@@ -30,20 +30,22 @@ public without sharing class OrderHelper {
         Set<Id> productIds = new Set<Id>();
 
         //ToDo: Loop through a query of OrderItems related to the activatedOrderIds
-        for(OrderItem oi: [SELECT Id, Quantity, Product2Id FROM OrderItem WHERE OrderId =: activatedOrderIds])
+        for(OrderItem oi: [SELECT Id, Quantity, Product2Id FROM OrderItem WHERE OrderId =: activatedOrderIds AND Quantity > 0])
             productIds.add(oi.Product2Id);
 
         //ToDo: Populate the map with the Id of the related Product2 as the key and Product2 record as the value
-        productMap = new Map<Id, Product2>([SELECT Id, Quantity_Ordered__c FROM Product2 WHERE Id IN :productIds]);
+        productMap = new Map<Id, Product2>([SELECT Id, Quantity_Ordered__c, Initial_Inventory__c FROM Product2 WHERE Id IN :productIds AND Quantity_Ordered__c > 0]);
 
         //ToDo: Loop through a query that aggregates the OrderItems related to the Products in the ProductMap keyset
         List<AggregateResult> agregateQtyOrderItems = [SELECT Product2Id, SUM(Quantity) sumQty FROM OrderItem
-                                                    WHERE Product2Id IN :productMap.keySet() 
+                                                    WHERE Product2Id IN :productMap.keySet()
+                                                    AND Quantity > 0
                                                     GROUP BY Product2Id];
 
-        for(AggregateResult agResult: agregateQtyOrderItems)
+        for(AggregateResult agResult: agregateQtyOrderItems) {
+            productMap.get((String) agResult.get('Product2Id')).Initial_Inventory__c -= Integer.valueOf(agResult.get('sumQty'));
             productMap.get((String) agResult.get('Product2Id')).Quantity_Ordered__c = Integer.valueOf(agResult.get('sumQty'));
-        
+        }
 
         //ToDo: Perform an update on the records in the productMap
         update productMap.values();
