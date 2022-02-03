@@ -1,6 +1,5 @@
-public without sharing class Product2Extension {
+public class Product2Extension {
 
-    //public List<Product2> productsToInsert {get;set;}
     public List<ProductWrapper> productsToInsert {get; set;}
 
     public Product2Extension(ApexPages.StandardController controller){
@@ -31,7 +30,6 @@ public without sharing class Product2Extension {
     public PageReference Save(){
 
         Savepoint sp = Database.setSavePoint();
-
         try {
             List<Product2> products = new List<Product2>();
             List<PriceBookEntry> pbEntries = new List<PriceBookEntry>();
@@ -43,16 +41,17 @@ public without sharing class Product2Extension {
 
                     products.add(pti.productRecord);
 
-                    pti.pricebookEntryRecord.IsActive = true;
-                    pti.pricebookEntryRecord.Pricebook2Id = Constants.STANDARD_PRICEBOOK_ID;
-                    
-                    pbEntries.add(pti.pricebookEntryRecord);
+                    PricebookEntry pbEntry = pti.pricebookEntryRecord;
+                    pbEntry.IsActive = true;
+                    pbEntry.UnitPrice = 10;
+                    pbEntry.Pricebook2Id = Constants.STANDARD_PRICEBOOK_ID; //cannot acces the constant
+                    pbEntries.add(pbEntry);
                 }
             }
             insert products;
-
+            
             for(Integer i = 0; i < products.size(); i++) {
-                    pbEntries[i].Product2Id = products[i].Id;
+                pbEntries[i].Product2Id = products[i].Id;
             }
             insert pbEntries;
 
