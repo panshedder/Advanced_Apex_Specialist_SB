@@ -27,7 +27,6 @@ public class AnnouncementQueueable implements Queueable {
             } else {
                 //ToDo: Enqueue the above instance of announcementQueueable
                 AnnouncementQueueable aq = new AnnouncementQueueable(announcements);
-                aq.toPost = announcements;
                 System.enqueueJob(aq);
                 break;
             }
