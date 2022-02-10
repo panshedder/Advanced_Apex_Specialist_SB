@@ -22,8 +22,17 @@ public class OrderExtension {
         }
         populateStdSetController();
         total = 0;
+        for(OrderItem oi: orderRecord.OrderItems) {
+            orderItemMap.put(oi.Product2Id, oi);
+            if(oi.Quantity > 0) {
+                if(pieData == null) {
+                    pieData = new List<ChartHelper.ChartData>();
+                }
+                pieData.add(new ChartHelper.ChartData(oi.Product2.Name, oi.Quantity * oi.UnitPrice));
+                total += oi.UnitPrice * oi.Quantity;
+            }
+        }
         PopulateOrderItemList();
-        LoadChartData();
     }
     
     //ToDo: Implement your own method to populate orderItemList
@@ -41,7 +50,7 @@ public class OrderExtension {
             WHERE IsActive = true AND Product2.Family = :selectedFamily
             ORDER BY Name];
         }
-        
+                
         standardSetController = new ApexPages.StandardSetController(pbe);
         standardSetController.setPageSize(Constants.DEFAULT_ROWS);
     }
@@ -65,13 +74,12 @@ public class OrderExtension {
                 orderItemMap.put(pbe.Product2Id, orderItem);
                 }
             }
-            
         }
         
-        public void LoadChartData() {
+        public void LoadChartData() { //Desglosar
             this.total = 0;
             pieData = new List<ChartHelper.ChartData>();
-            for(OrderItem oi: orderItemMap.values()) {
+            for(OrderItem oi: orderRecord.OrderItems) {
                 if(oi.Quantity > 0) {
                     pieData.add(new ChartHelper.ChartData(oi.Product2.Name, oi.Quantity * oi.UnitPrice));
 
