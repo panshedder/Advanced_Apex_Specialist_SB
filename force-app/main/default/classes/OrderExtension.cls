@@ -86,9 +86,7 @@ public class OrderExtension {
                 total += oi.UnitPrice * oi.Quantity;
             }
         }
-        
     }
-    
     
     /**
      * @name OnFieldChange
@@ -151,7 +149,6 @@ public class OrderExtension {
         
     }
     
-    
     /**
      * @name First
      * @description
@@ -161,7 +158,6 @@ public class OrderExtension {
         PopulateOrderItemList();
     }
     
-    
     /**
      * @name Next
      * @description
@@ -170,7 +166,6 @@ public class OrderExtension {
         standardSetController.next();
         PopulateOrderItemList();
     }
-    
     
     /**
      * @name Previous
