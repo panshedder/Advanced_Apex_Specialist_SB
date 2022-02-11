@@ -32,7 +32,6 @@ private class OrderTests {
 
         OrderExtension controllerExtension = new OrderExtension(standardController);
 
-
         controllerExtension.OnFieldChange();
         controllerExtension.selectFamily();
         controllerExtension.Save();
