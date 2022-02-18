@@ -3,6 +3,8 @@
  * @description This class posts Chatter Announcements
 **/
 public class AnnouncementQueueable implements Queueable {
+    @testVisible
+    public static Boolean doChainJob = true;
 
     public List<ConnectApi.AnnouncementInput> toPost;
 
@@ -27,7 +29,10 @@ public class AnnouncementQueueable implements Queueable {
             } else {
                 //ToDo: Enqueue the above instance of announcementQueueable
                 AnnouncementQueueable aq = new AnnouncementQueueable(announcements);
-                System.enqueueJob(aq);
+
+                if(doChainJob)
+                    System.enqueueJob(aq);
+                    
                 break;
             }
         }

@@ -10,6 +10,7 @@ private class OrderTests {
         List<Product2> oldProduct = [SELECT Id, Quantity_Ordered__c, Initial_Inventory__c FROM Product2 limit 1];
         List<Product2> newProduct = new List<Product2>();
 
+        AnnouncementQueueable.doChainJob = false;
         Test.startTest();
         List<Order> orders = [SELECT Id, Status FROM Order WHERE Status != :Constants.ACTIVATED_ORDER_STATUS];
         orders[0].Status = Constants.ACTIVATED_ORDER_STATUS;
@@ -18,10 +19,10 @@ private class OrderTests {
         
         newProduct = [SELECT Id, Quantity_Ordered__c, Initial_Inventory__c FROM Product2 WHERE Id =: oldProduct[0].Id];
 
-        TestDataFactory.VerifyQuantityOrdered(oldProduct[0], newProduct[0], 0);
+        TestDataFactory.VerifyQuantityOrdered(oldProduct[0], newProduct[0], Constants.DEFAULT_ROWS);
     }
 
-    @isTest static void OrderExtension_UnitTest() {
+    @isTest private static void OrderExtension_UnitTest() {
         List<Order> orders = [SELECT Id FROM Order LIMIT 1];
 
         Pagereference orderEditPage = Page.OrderEdit;
