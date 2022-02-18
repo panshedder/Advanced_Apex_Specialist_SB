@@ -1,11 +1,11 @@
-@isTest
+@isTest(SeeAllData = true) 
 private class Product2Tests {
 
     /**
      * @name product2Extension_UnitTest
      * @description UnitTest for product2Extension
     **/
-    @isTest static void Product2Extension_UnitTest(){
+    @isTest private static void Product2Extension_UnitTest(){
         List<Product2> productPage = TestDataFactory.ConstructProducts(1);
         Integer familiesNumber = Constants.PRODUCT_FAMILY.size();
 
@@ -37,9 +37,58 @@ private class Product2Tests {
         Test.startTest();
             ext.Save();
         Test.stopTest();
+    }
 
-        List<Product2> products = [SELECT Id FROM Product2 WHERE Name = 'Test class Ext%'];
+    @isTest private static void Product2Trigger_UnitTest() {
+        List<ConnectApi.AnnouncementInput> toPost = new List<ConnectApi.AnnouncementInput>();
+        
+        Inventory_Setting__mdt lowBeverageInventory = [SELECT DeveloperName, Low_Quantity_Alert__c 
+                                                        FROM Inventory_Setting__mdt
+                                                        WHERE DeveloperName = 'Beverage'];
+        
 
-        System.assertEquals(Constants.DEFAULT_ROWS * 2, products.size());
+        CollaborationGroup collaborationGroupConstructed = TestDataFactory.ConstructCollaborationGroup();
+        insert collaborationGroupConstructed;
+        List<Product2> productConstructed = TestDataFactory.ConstructProducts(1);
+        productConstructed[0].Family = 'Beverage';
+        insert productConstructed;
+        List<PricebookEntry> pricebookEntriesConstructed = TestDataFactory.ConstructPricebookEntries(productConstructed);
+        insert pricebookEntriesConstructed;
+        List<Account> accountsContructed = TestDataFactory.ConstructAccounts(1);
+        insert accountsContructed;
+        List<Contact> contactsConstructed = TestDataFactory.ConstructContacts(1, accountsContructed);
+        insert contactsConstructed;
+        List<Order> ordersConstructed = TestDataFactory.ConstructOrders(1, accountsContructed);
+        insert ordersConstructed;
+        List<OrderItem> orderItemsConstructed = TestDataFactory.ConstructOrderItems(1, pricebookEntriesConstructed, ordersConstructed);
+        insert orderItemsConstructed;
+
+        AnnouncementQueueable.doChainJob = false;
+        Test.startTest();
+        productConstructed[0].Quantity_Ordered__c = lowBeverageInventory.Low_Quantity_Alert__c + 1;
+        update productConstructed;
+
+        //Simulate Post
+        ConnectApi.TextSegmentInput textSegmentInput = new ConnectApi.TextSegmentInput();
+        textSegmentInput.text = 'Test' + Constants.INVENTORY_LEVEL_LOW;
+
+        ConnectApi.MessageBodyInput msgBody = new ConnectApi.MessageBodyInput();
+        msgBody.messageSegments = new List<ConnectApi.TextSegmentInput>();
+        msgBody.messageSegments.add(textSegmentInput);
+
+        ConnectApi.AnnouncementInput singlePost = new ConnectApi.AnnouncementInput();
+        singlePost.expirationDate = System.now().addDays(1);
+        singlePost.sendEmails = false;
+        singlePost.body = msgBody;
+        singlePost.parentId = collaborationGroupConstructed.Id;
+        toPost.add(singlePost);
+
+        AnnouncementQueueable anqu = new AnnouncementQueueable(toPost);
+        System.enqueueJob(anqu);
+        Test.stopTest();
+
+        List<FeedItem> fi = [SELECT Id FROM FeedItem LIMIT 1];
+
+        System.assert(1 == fi.size());
     }
 }

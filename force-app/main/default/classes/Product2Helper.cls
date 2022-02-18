@@ -1,5 +1,4 @@
 public class Product2Helper {
-
     /**
      * @name COLLABORATION_GROUP
      * @description List of CollaborationGroup used in both business and test logic
@@ -73,6 +72,7 @@ public class Product2Helper {
         }
         // ToDo: Create and enqueue an instance of the announcementQueuable class with the list of Products
         AnnouncementQueueable anqu = new AnnouncementQueueable(toPost);
+
         System.enqueueJob(anqu);
     }
 }
